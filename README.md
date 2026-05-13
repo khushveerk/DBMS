@@ -59,26 +59,31 @@ select*from enrollment;
 
 -- Queries
 -- 1-Retrieve names of students enrolled in any society
+
 SELECT DISTINCT s.Student_name
 FROM Student s
 JOIN enrollment e 
 ON s.ROLLNO = e.ROLLNO;
 
 -- 2- Retrieve all society names.
+
 select SocName 
 from Society;
 
 -- 3-Retrieve students' names starting with the letter ‘A’.
+
 select distinct Student_name
 from Student
 where Student_name like 'A%';
 
 -- 4-Retrieve students' details studying in courses ‘computer science’ or ‘chemistry’
+
 select *
 from student
 where Course = 'ComputerSc' or Course = 'Chemistry';
 
 -- 5-Retrieve students’ names whose roll no either starts with ‘X’ or ‘Z’ and ends with ‘9’
+
 select Student_name 
 from student
 where (ROLLNO like 'X%9' or  ROLLNO like 'Z%9');
@@ -90,12 +95,14 @@ from society
 where TotalSeats > 15;
 
 -- 7-Update society table for the mentor name of a specific society
+
 update society
 set MentorName  = 'Gaurav'
 where SocID = 's3';
 select *from society;
 
 -- 8-Find society names in which more than five students have enrolled
+
 select s.SocName
 from society s
 join enrollment e
@@ -112,6 +119,7 @@ INSERT INTO enrollment VALUES ('X4','s1','2022-01-05');
 --------------------------------------------------------------------------------------------------------------------
 
 -- 9-Find the name of the youngest student enrolled in society ‘NSS’
+
 use student_society;
 select s.Student_name from Student s
 join enrollment e on s.ROLLNO = e.ROLLNO
@@ -123,6 +131,7 @@ and s.DOB = (select max(s2.DOB) from Student s2
                 where so2.SocName = 'NSS');
 
 -- 10-Find the name of the most popular society (on the basis of enrolled students)
+
 SELECT s.SocName
 FROM society s
 JOIN enrollment e ON s.SocID = e.SID
@@ -149,6 +158,7 @@ WHERE NOT EXISTS (
 );
 
 -- 13-Find the students names enrolled in at least two societies 
+
 select s.Student_name from Student s
 join enrollment e on 
 e.ROLLNO = s.ROLLNO
@@ -182,6 +192,7 @@ join society so on e.SID = so.SocID
 	where 	so.SocName  in('Debating' or 'Dancing' and  'Sashakt');
     
 -- 17-- Find society names such that its mentor has a name with ‘Gupta’ in it.
+
 select SocName from society 
 where MentorName like '%Gupta';
 
@@ -209,12 +220,14 @@ select
     from society;
     
 -- 21- – Add the enrollment fees paid (‘yes’/’No’) field in the enrollment table.
+
 alter table enrollment
 add column feesPaid enum('yes','no');
 desc enrollment;
 
 -- 22-Update date of enrollment of society id ‘s1’ to ‘2018-01-15’, ‘s2’ to the current date and ‘s3’ to
 ‘2018-01-02’.
+
 UPDATE enrollment
 SET DateofEnrollment = CASE
     WHEN SID = 's1' THEN '2018-01-15'
@@ -224,6 +237,7 @@ END
 WHERE SID IN ('s1', 's2', 's3');
 
 -- 23 - Create a view to keep track of society names with the total number of students enrolled in it
+
 CREATE VIEW society_enrollment_count AS
 SELECT 
     so.SocName,
@@ -236,6 +250,7 @@ GROUP BY so.SocID, so.SocName;
 select *  from society_enrollment_count;
 
 -- 24-Find student names enrolled in all the societies.
+
 SELECT s.Student_name
 FROM Student s
 JOIN enrollment e ON s.ROLLNO = e.ROLLNO
@@ -245,6 +260,7 @@ HAVING COUNT(DISTINCT e.SID) = (
 );
 
 -- 25-Count the number of societies with more than 5 students enrolled in it
+
 SELECT COUNT(*) AS No_of_Societies
 FROM (
     SELECT e.SID
@@ -287,6 +303,7 @@ AND SocName IN (
 
 -- 30- Display the following information: Society name, Mentor name ,Total Capacity ,Total Enrolled
 ,Unfilled Seats.
+
 SELECT 
     so.SocName,
     so.MentorName,
