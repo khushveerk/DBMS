@@ -1,10 +1,17 @@
 # DBMS
+
 drop database student_society;
+
 create database student_society;
+
 show databases;
+
 use student_society;
+
 create table  Student(ROLLNO char(6) primary key ,Student_name varchar(20) ,Course varchar(10),DOB date);
+
 show tables;
+
 
 insert into Student
 values
@@ -15,9 +22,12 @@ values
 ('X4', 'Raju', 'Biology','2001-01-10');
 
 select *from student;
+
 desc Student;
 
+
 create table society(SocID char(6) primary key, SocName varchar(20), MentorName varchar(15), TotalSeats int unsigned);
+
 show tables;
 
 insert into society
@@ -27,9 +37,11 @@ values
     ('s3','Dancing','Aryan',13),
     ('s4', 'Sashakt', 'Bhatia',10),
     ('s5','QuickSort', 'Ms.Sheetal',15);
+	
 select *from society;
 
 create table enrollment(ROLLNO char(6), SID char(6), DateofEnrollment date, foreign key(ROLLNO) references Student(ROLLNO), foreign key(SID) references society(SocID));
+
 show tables;
 
 insert	into enrollment
@@ -39,8 +51,11 @@ values
     ('X9','s3','2018-11-19'),
     ('Z9','s4','2020-01-11'),
     ('X4','s5','2021-03-27');
+	
 desc enrollment;
+
 select*from enrollment;
+
 
 -- Queries
 -- 1-Retrieve names of students enrolled in any society
@@ -115,14 +130,16 @@ GROUP BY s.SocID, s.SocName
 ORDER BY COUNT(e.ROLLNO) DESC
 LIMIT 1;
 
--- 11
+-- 11-Find the name of two least popular societies (on the basis of enrolled students)
+
 select s.SocName from society s
 join enrollment e on s.SocID = e.SID
 group by s.SocID, s.SocName
  order by count(e.ROLLNO) asc
 limit 2;
 
--- 12
+-- 12- Find the students names who are not enrolled in any society.
+
 SELECT s.Student_name
 FROM Student s
 WHERE NOT EXISTS (
@@ -131,14 +148,15 @@ WHERE NOT EXISTS (
     WHERE e.ROLLNO = s.ROLLNO
 );
 
--- 13 
+-- 13-Find the students names enrolled in at least two societies 
 select s.Student_name from Student s
 join enrollment e on 
 e.ROLLNO = s.ROLLNO
 group by s.ROLLNO,s.Student_name
 having count(distinct e.SID) >=2;
 
--- 14
+-- 14-Find society names in which maximum students are enrolled
+
 SELECT so.SocName
 FROM society so
 JOIN enrollment e ON so.SocID = e.SID
@@ -146,29 +164,36 @@ GROUP BY so.SocID, so.SocName
 ORDER BY COUNT(e.ROLLNO) DESC
 LIMIT 1;
 
--- 15
+-- 15- Find names of all students who have enrolled in any society and society names in which at least
+one student has enrolled
+
 SELECT distinct s.Student_name, so.SocName
 FROM Student s
 join enrollment e on s.ROLLNO = e.ROLLNO
 join society so on e.SID = so.SocID;
 
--- 16 
+-- 16-Find names of students who are enrolled in any of the three societies ‘Debating’, ‘Dancing’ and
+‘Sashakt’.
+
+
 select  s.Student_name from student s
 join enrollment e on s.ROLLNO = e.ROLLNO
 join society so on e.SID = so.SocID
 	where 	so.SocName  in('Debating' or 'Dancing' and  'Sashakt');
     
--- 17
+-- 17-- Find society names such that its mentor has a name with ‘Gupta’ in it.
 select SocName from society 
 where MentorName like '%Gupta';
 
--- 18
+-- 18- Find the society names in which the number of enrolled students is only 10% of its capacity.
+
 select so.SocName from society so
 join enrollment e on so.SocId = e.SID
 group by so.SocID,so.SocName, so.TotalSeats
 having count(e.ROLLNO) = 0.1 * so.TotalSeats;
 
--- 19
+-- 19-Display the vacant seats for each society.
+
 SELECT 
     so.SocName,
     so.TotalSeats - COUNT(e.ROLLNO) AS Vacant_Seats
@@ -177,17 +202,19 @@ LEFT JOIN enrollment e
 ON so.SocID = e.SID
 GROUP BY so.SocID, so.SocName, so.TotalSeats;
 
--- 20
+-- 20 - Increment Total Seats of each society by 10%
+
 select 
 	TotalSeats + 0.1* Totalseats as newtotalSeats,SocName
     from society;
     
--- 21
+-- 21- – Add the enrollment fees paid (‘yes’/’No’) field in the enrollment table.
 alter table enrollment
 add column feesPaid enum('yes','no');
 desc enrollment;
 
--- 22
+-- 22-Update date of enrollment of society id ‘s1’ to ‘2018-01-15’, ‘s2’ to the current date and ‘s3’ to
+‘2018-01-02’.
 UPDATE enrollment
 SET DateofEnrollment = CASE
     WHEN SID = 's1' THEN '2018-01-15'
@@ -196,7 +223,7 @@ SET DateofEnrollment = CASE
 END
 WHERE SID IN ('s1', 's2', 's3');
 
--- 23 
+-- 23 - Create a view to keep track of society names with the total number of students enrolled in it
 CREATE VIEW society_enrollment_count AS
 SELECT 
     so.SocName,
@@ -208,7 +235,7 @@ GROUP BY so.SocID, so.SocName;
 
 select *  from society_enrollment_count;
 
--- 24
+-- 24-Find student names enrolled in all the societies.
 SELECT s.Student_name
 FROM Student s
 JOIN enrollment e ON s.ROLLNO = e.ROLLNO
@@ -217,7 +244,7 @@ HAVING COUNT(DISTINCT e.SID) = (
     SELECT COUNT(*) FROM society
 );
 
--- 25
+-- 25-Count the number of societies with more than 5 students enrolled in it
 SELECT COUNT(*) AS No_of_Societies
 FROM (
     SELECT e.SID
@@ -226,23 +253,28 @@ FROM (
     HAVING COUNT(e.ROLLNO) > 5
 ) AS temp;
 
- -- 26
+ -- 26- - Add column Mobile number in student table with default value ‘9999999999’
+ 
  alter table Student
  add column MobileNo varchar(15) default '99999999' ;
  
- -- 27
+ -- 27 - Find the total number of students whose age is > 20 years.
+ 
  SELECT COUNT(*) AS Total_Students
 FROM Student
 WHERE TIMESTAMPDIFF(YEAR, DOB, CURDATE()) > 20;
 
--- 28
+-- 28-Find names of students who were born in 2001 and are enrolled in at least one society
+
 SELECT DISTINCT s.Student_name
 FROM Student s
 JOIN enrollment e 
 ON s.ROLLNO = e.ROLLNO
 WHERE YEAR(s.DOB) = 2001;
 
--- 29 
+-- 29 -. Count all societies whose name starts with ‘S’ and ends with ‘t’ and at least 5 students are
+enrolled in the society.
+
 SELECT COUNT(*)
 FROM society
 WHERE SocName LIKE 'S%t'
@@ -253,7 +285,8 @@ AND SocName IN (
     HAVING COUNT(ROLLNO) >= 5
 );
 
--- 30
+-- 30- Display the following information: Society name, Mentor name ,Total Capacity ,Total Enrolled
+,Unfilled Seats.
 SELECT 
     so.SocName,
     so.MentorName,
